@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router";
 import type { Route } from "./+types/home";
+import { useAuth } from "~/context/AuthContext";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -10,6 +11,8 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const auth = useAuth();
+
   const blocks = useMemo(() => {
     const palette = [
       "#0b1f4d",
@@ -68,39 +71,65 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Top left */}
             <div className="rounded-3xl border border-gray-200 bg-gray-50/80 p-6 backdrop-blur-sm">
-              <p className="text-sm font-semibold text-gray-500">Auth</p>
+              <p className="text-sm font-semibold text-gray-500">
+                {auth.token ? "Status" : "Auth"}
+              </p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">
-                Create an account
+                {auth.token ? "You are logged in" : "Create an account"}
               </h2>
               <p className="mt-2 text-sm text-gray-600">
-                Stores a bcrypt-hashed password and unique email.
+                {auth.token
+                  ? `Welcome back${auth.user?.name ? `, ${auth.user.name}` : ""}. Your token is active.`
+                  : "Stores a bcrypt-hashed password and unique email."}
               </p>
               <div className="mt-5">
-                <Link
-                  className="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700"
-                  to="/signup"
-                >
-                  Signup
-                </Link>
+                {auth.token ? (
+                  <Link
+                    className="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                    to="/dashboard"
+                  >
+                    Open dashboard
+                  </Link>
+                ) : (
+                  <Link
+                    className="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                    to="/signup"
+                  >
+                    Signup
+                  </Link>
+                )}
               </div>
             </div>
 
             {/* Top middle */}
             <div className="rounded-3xl border border-gray-200 bg-gray-50/80 p-6 backdrop-blur-sm">
-              <p className="text-sm font-semibold text-gray-500">Auth</p>
+              <p className="text-sm font-semibold text-gray-500">
+                {auth.token ? "Session" : "Auth"}
+              </p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">
-                Login + get JWT
+                {auth.token ? "Logged-in token" : "Login + get JWT"}
               </h2>
               <p className="mt-2 text-sm text-gray-600">
-                Token is saved to localStorage for persistence.
+                {auth.token
+                  ? "Token is loaded from localStorage and profile is available."
+                  : "Token is saved to localStorage for persistence."}
               </p>
               <div className="mt-5">
-                <Link
-                  className="inline-flex w-full items-center justify-center rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50"
-                  to="/login"
-                >
-                  Login
-                </Link>
+                {auth.token ? (
+                  <button
+                    onClick={() => auth.logout()}
+                    className="inline-flex w-full items-center justify-center rounded-2xl border border-red-300 bg-white px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <Link
+                    className="inline-flex w-full items-center justify-center rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50"
+                    to="/login"
+                  >
+                    Login
+                  </Link>
+                )}
               </div>
             </div>
 
